@@ -1,4 +1,5 @@
 const ws = new WebSocket("ws://192.168.240.1:8080")
+const progress = document.querySelector("progress")
 ws.addEventListener("open", (e) => {
   console.log("successfull connection")
 })
