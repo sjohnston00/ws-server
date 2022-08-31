@@ -1,3 +1,4 @@
+//@ts-check
 import { WebSocketServer, WebSocket } from "ws";
 import ip from "ip";
 import { v4 as uuid } from "uuid";
@@ -10,10 +11,20 @@ const lobbies = new Set();
 wss.on("connection", function connection(ws, req) {
   const ip = req.socket.remoteAddress;
   console.log("connection from", ip);
-  ws.on("message", function message(data) {
-    if (data.toString() === "create-lobby") {
+  ws.on("message", function message(d) {
+    const data = parseMsgData(d);
+    if (!data) return;
+
+    if (data.type === "create-lobby") {
       createLobby();
       console.log(lobbies);
+    }
+    if (data.type === "join-lobby") {
+      joinLobby(data.data.lobbyId); //TODO: change messages to be parsed as JSON, so we can know the type of message and the data
+      // {
+      //   type: 'game-event', //or 'join-lobby', 'create-lobby' etc,
+      //   data: any
+      // }
     }
 
     wss.clients.forEach((client) => {
@@ -37,6 +48,24 @@ function createLobby() {
     return;
   }
   lobbies.add(newLobbyId);
+}
+function joinLobby(lobbyId) {
+  if (!lobbies.has(lobbyId)) {
+    console.log(`This lobby does not exist`);
+    return;
+  }
+  console.log("Joined a correct lobby");
+}
+
+function parseMsgData(data) {
+  const msg = data.toString();
+  let json;
+  try {
+    json = JSON.parse(msg);
+  } catch (error) {
+    json = null;
+  }
+  return json;
 }
 
 function makeid(length = 5) {

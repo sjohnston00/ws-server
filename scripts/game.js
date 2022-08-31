@@ -183,7 +183,21 @@ document.body.addEventListener("keydown", (e) => {
 });
 
 createLobbyBtn.addEventListener("click", () => {
-  ws.send("create-lobby");
+  const data = JSON.stringify({
+    type: "create-lobby",
+    data: null
+  });
+  ws.send(data);
+});
+joinLobbyBtn.addEventListener("click", () => {
+  const lobbyId = prompt("Enter lobby id");
+  const data = JSON.stringify({
+    type: "join-lobby",
+    data: {
+      lobbyId
+    }
+  });
+  ws.send(data);
 });
 
 function getChildElementIndex(node) {
