@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "ip": "^1.1.8",
+    "uuid": "^8.3.2",
     "ws": "^8.8.1"
   }
 }
