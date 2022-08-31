@@ -1,5 +1,7 @@
 const ws = new WebSocket("ws://192.168.1.21:8080");
 const progress = document.querySelector("progress");
+const createLobbyBtn = document.getElementById("create-lobby");
+const joinLobbyBtn = document.getElementById("join-lobby");
 ws.addEventListener("open", (e) => {
   console.log("successfull connection");
 });
@@ -178,6 +180,10 @@ document.body.addEventListener("keydown", (e) => {
 
     return;
   }
+});
+
+createLobbyBtn.addEventListener("click", () => {
+  ws.send("create-lobby");
 });
 
 function getChildElementIndex(node) {
