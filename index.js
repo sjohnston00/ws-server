@@ -20,11 +20,7 @@ wss.on("connection", function connection(ws, req) {
       console.log(lobbies);
     }
     if (data.type === "join-lobby") {
-      joinLobby(data.data.lobbyId); //TODO: change messages to be parsed as JSON, so we can know the type of message and the data
-      // {
-      //   type: 'game-event', //or 'join-lobby', 'create-lobby' etc,
-      //   data: any
-      // }
+      joinLobby(data.data.lobbyId);
     }
 
     wss.clients.forEach((client) => {
