@@ -8,3 +8,10 @@ ws.addEventListener("message", async (e) => {
   document.body.innerHTML += "<br/>" + data;
   console.log(data);
 });
+ws.addEventListener("error", async (e) => {
+  console.log("error", e);
+});
+ws.addEventListener("close", async (e) => {
+  console.log("close", e);
+  console.log(ws);
+});

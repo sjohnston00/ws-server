@@ -1,3 +1,1 @@
-import a from "./module.js"
-
-console.log(a)
+import * as _ from "./game.js";
