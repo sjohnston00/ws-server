@@ -6,24 +6,32 @@ const createLobbyBtn = document.getElementById("create-lobby")
 const joinLobbyBtn = document.getElementById("join-lobby")
 const lobbyIdInput = document.getElementById("lobby-id")
 const lobbyInfo = document.getElementById("lobby-info")
-const currentLobby = {
-  lobbyId: "",
-  player1: "",
-  player2: "",
-}
+const wsInfo = document.getElementById("ws-info")
+let wsEvents = 0
+let currentLobby
 ws.addEventListener("open", (e) => {
-  console.log("successfull connection")
+  updateWsInfo()
 })
 ws.addEventListener("message", async (e) => {
+  wsEvents++
+  updateWsInfo()
+
   const data = e.data
   const json = JSON.parse(data)
 
+  console.log(json)
+  console.log(currentLobby)
+
+  if (json.data?.lobby?.id !== currentLobby?.lobby.id) return
+
   if (json.type === "create-lobby") {
-    createLobby(json.data.lobbyId, json.data.player1)
+    currentLobby = json.data
+    createLobby(currentLobby)
     return
   }
   if (json.type === "join-lobby") {
-    joinLobby(json.data)
+    currentLobby = json.data
+    joinLobby(currentLobby)
     return
   }
   if (player === 2) {
@@ -225,28 +233,29 @@ joinLobbyBtn?.addEventListener("click", () => {
   ws.send(data)
 })
 
+function updateWsInfo() {
+  wsInfo.textContent = JSON.stringify({
+    ws: "open",
+    events: wsEvents,
+  })
+}
+
 function getChildElementIndex(node) {
   return Array.prototype.indexOf.call(node.parentNode.children, node)
 }
 
-function createLobby(lobbyId, player1) {
-  currentLobby.lobbyId = lobbyId
-  currentLobby.player1 = player1
+function createLobby(lobby) {
   createLobbyBtn.setAttribute("disabled", "true")
   joinLobbyBtn.setAttribute("disabled", "true")
   lobbyIdInput.value = ""
   lobbyIdInput.setAttribute("disabled", "true")
-  lobbyInfo.textContent = JSON.stringify(currentLobby, null, 2)
+  lobbyInfo.textContent = JSON.stringify(lobby, null, 2)
 }
 
-function joinLobby(data) {
-  const { lobbyId, lobby } = data
-  currentLobby.lobbyId = lobbyId
-  currentLobby.player1 = lobby.player1
-  currentLobby.player2 = lobby.player2
+function joinLobby(lobby) {
   createLobbyBtn.setAttribute("disabled", "true")
   joinLobbyBtn.setAttribute("disabled", "true")
   lobbyIdInput.value = ""
   lobbyIdInput.setAttribute("disabled", "true")
-  lobbyInfo.textContent = JSON.stringify(currentLobby, null, 2)
+  lobbyInfo.textContent = JSON.stringify(lobby, null, 2)
 }
