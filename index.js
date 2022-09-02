@@ -57,7 +57,7 @@ function createLobby(ws, ip) {
     JSON.stringify({
       type: "create-lobby",
       message: "Lobby was created successfully",
-      data: newLobbyId,
+      data: { lobbyId: newLobbyId, player1: ip },
     })
   )
 }

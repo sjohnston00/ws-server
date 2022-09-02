@@ -5,11 +5,27 @@ const progress = document.querySelector("progress")
 const createLobbyBtn = document.getElementById("create-lobby")
 const joinLobbyBtn = document.getElementById("join-lobby")
 const lobbyIdInput = document.getElementById("lobby-id")
+const lobbyInfo = document.getElementById("lobby-info")
+const currentLobby = {
+  lobbyId: "",
+  player1: "",
+  player2: "",
+}
 ws.addEventListener("open", (e) => {
   console.log("successfull connection")
 })
 ws.addEventListener("message", async (e) => {
-  const data = await e.data.text()
+  const data = e.data
+  const json = JSON.parse(data)
+
+  if (json.type === "create-lobby") {
+    createLobby(json.data.lobbyId, json.data.player1)
+    return
+  }
+  if (json.type === "join-lobby") {
+    joinLobby(json.data)
+    return
+  }
   if (player === 2) {
     if (data.startsWith("player2")) return
 
@@ -211,4 +227,26 @@ joinLobbyBtn?.addEventListener("click", () => {
 
 function getChildElementIndex(node) {
   return Array.prototype.indexOf.call(node.parentNode.children, node)
+}
+
+function createLobby(lobbyId, player1) {
+  currentLobby.lobbyId = lobbyId
+  currentLobby.player1 = player1
+  createLobbyBtn.setAttribute("disabled", "true")
+  joinLobbyBtn.setAttribute("disabled", "true")
+  lobbyIdInput.value = ""
+  lobbyIdInput.setAttribute("disabled", "true")
+  lobbyInfo.textContent = JSON.stringify(currentLobby, null, 2)
+}
+
+function joinLobby(data) {
+  const { lobbyId, lobby } = data
+  currentLobby.lobbyId = lobbyId
+  currentLobby.player1 = lobby.player1
+  currentLobby.player2 = lobby.player2
+  createLobbyBtn.setAttribute("disabled", "true")
+  joinLobbyBtn.setAttribute("disabled", "true")
+  lobbyIdInput.value = ""
+  lobbyIdInput.setAttribute("disabled", "true")
+  lobbyInfo.textContent = JSON.stringify(currentLobby, null, 2)
 }
