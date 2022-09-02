@@ -16,10 +16,11 @@ wss.on("connection", function connection(ws, req) {
 
     if (data.type === "create-lobby") {
       createLobby(ws, ip)
-      console.log(lobbies)
+      return
     }
     if (data.type === "join-lobby") {
       joinLobby(data.data.lobbyId, ws, ip)
+      return
     }
 
     wss.clients.forEach((client) => {
@@ -111,8 +112,7 @@ function parseMsgData(data) {
 
 function makeid(length = 5) {
   var result = ""
-  var characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
   var charactersLength = characters.length
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength))
