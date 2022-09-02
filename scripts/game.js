@@ -1,8 +1,10 @@
+//@ts-nocheck
 const myIPs = ["192.168.1.21", "192.168.1.82"]
 const ws = new WebSocket(`ws://${myIPs[1]}:8080`)
 const progress = document.querySelector("progress")
 const createLobbyBtn = document.getElementById("create-lobby")
 const joinLobbyBtn = document.getElementById("join-lobby")
+const lobbyIdInput = document.getElementById("lobby-id")
 ws.addEventListener("open", (e) => {
   console.log("successfull connection")
 })
@@ -183,19 +185,25 @@ document.body.addEventListener("keydown", (e) => {
   }
 })
 
-createLobbyBtn.addEventListener("click", () => {
+createLobbyBtn?.addEventListener("click", () => {
   const data = JSON.stringify({
     type: "create-lobby",
     data: null,
   })
   ws.send(data)
 })
-joinLobbyBtn.addEventListener("click", () => {
-  const lobbyId = prompt("Enter lobby id")
+joinLobbyBtn?.addEventListener("click", () => {
+  const { value } = lobbyIdInput
+  if (!value) {
+    alert("Please enter a lobby id")
+    lobbyIdInput?.focus()
+    return
+  }
+
   const data = JSON.stringify({
     type: "join-lobby",
     data: {
-      lobbyId,
+      lobbyId: value,
     },
   })
   ws.send(data)

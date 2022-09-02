@@ -53,3 +53,6 @@ button {
 .gap-2 {
   gap: 0.5rem;
 }
+.join-lobby-wrapper {
+  display: flex;
+}
