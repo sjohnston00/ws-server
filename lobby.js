@@ -2,7 +2,7 @@ export class Lobby {
   id
   players = []
   created = new Date()
-  lastUpdate = new Date()
+  lastUpdated = new Date()
   events = [
     {
       type: "lobby-created",
