@@ -1,7 +1,12 @@
 import { WebSocketServer, WebSocket } from "ws"
 import ip from "ip"
 import { v4 as uuid } from "uuid"
-import { createLobby, joinLobby, makeMove } from "./lobbyController.js"
+import {
+  createLobby,
+  exitLobby,
+  joinLobby,
+  makeMove,
+} from "./lobbyController.js"
 
 const PORT = 8080
 const IP_ADDRESS = ip.address()
@@ -38,13 +43,26 @@ wss.on("connection", function connection(ws, req) {
       // return
     }
     if (data.type === "move") {
-      console.log(data)
       const lobby = makeMove(data.data.lobbyId, data.data.move, ip)
       broadcast(
         JSON.stringify({
           type: "move",
           message: `Move was made by ${ip}`,
           data: { lobby },
+        }),
+        ws
+      )
+      // return
+    }
+    if (data.type === "exit-lobby") {
+      const lobbyId = data.lobbyId
+      const lobby = exitLobby(lobbyId, ip)
+      broadcast(
+        JSON.stringify({
+          type: "exit-lobby",
+          message: `Player ${ip} has left the lobby`,
+          lobbyId,
+          data: lobby,
         }),
         ws
       )

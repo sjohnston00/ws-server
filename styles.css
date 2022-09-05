@@ -60,3 +60,8 @@ button {
   height: 400px;
   overflow-y: auto;
 }
+
+#exit-lobby {
+  opacity: 0;
+  pointer-events: none;
+}

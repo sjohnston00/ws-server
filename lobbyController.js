@@ -86,3 +86,22 @@ export function makeMove(lobbyId, data, ip) {
   lobbies.set(lobbyId, lobby)
   return lobby
 }
+
+export function exitLobby(lobbyId, ip) {
+  if (!lobbies.has(lobbyId)) {
+    console.log(`This lobby does not exist`)
+    return
+  }
+
+  const lobby = lobbies.get(lobbyId)
+  lobby.players = lobby.players.splice(lobby.players.indexOf(ip), 1)
+  lobby.lastUpdated = new Date()
+
+  lobby.logEvent({
+    type: "exit-lobby",
+    message: `player ${ip} has left the lobby`,
+    data: null,
+  })
+  lobbies.set(lobbyId, lobby)
+  return lobby
+}

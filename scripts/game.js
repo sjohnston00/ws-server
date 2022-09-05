@@ -4,6 +4,7 @@ const ws = new WebSocket(`ws://${myIPs[2]}:8080`)
 const progress = document.querySelector("progress")
 const createLobbyBtn = document.getElementById("create-lobby")
 const joinLobbyBtn = document.getElementById("join-lobby")
+const exitLobbyBtn = document.getElementById("exit-lobby")
 const lobbyIdInput = document.getElementById("lobby-id")
 const lobbyInfo = document.getElementById("lobby-info")
 const wsInfo = document.getElementById("ws-info")
@@ -17,8 +18,8 @@ ws.addEventListener("message", async (e) => {
   const data = e.data
   const json = JSON.parse(data)
 
-  console.log(json)
-  console.log(currentLobby)
+  // console.log(json)
+  // console.log(currentLobby)
 
   if (!currentLobby && json.type === "create-lobby") {
     currentLobby = json.data.lobby
@@ -28,6 +29,11 @@ ws.addEventListener("message", async (e) => {
   if (!currentLobby && json.type === "join-lobby") {
     currentLobby = json.data.lobby
     joinLobby(currentLobby)
+    return
+  }
+
+  if (currentLobby.id === json.lobbyId && json.type === "exit-lobby") {
+    updateLobbyInfo(undefined)
     return
   }
 
@@ -247,6 +253,24 @@ joinLobbyBtn?.addEventListener("click", () => {
   ws.send(data)
 })
 
+exitLobbyBtn.addEventListener("click", () => {
+  if (!currentLobby) return
+
+  ws.send(
+    JSON.stringify({
+      type: "exit-lobby",
+      lobbyId: currentLobby.id,
+    })
+  )
+
+  createLobbyBtn.removeAttribute("disabled")
+  joinLobbyBtn.removeAttribute("disabled")
+  exitLobbyBtn.style.pointerEvents = "none"
+  exitLobbyBtn.style.opacity = "0"
+  lobbyIdInput.value = ""
+  lobbyIdInput.removeAttribute("disabled")
+})
+
 function updateWsInfo(data) {
   wsInfo.textContent = JSON.stringify(data, null, 2)
 }
@@ -258,6 +282,8 @@ function getChildElementIndex(node) {
 function createLobby(lobby) {
   createLobbyBtn.setAttribute("disabled", "true")
   joinLobbyBtn.setAttribute("disabled", "true")
+  exitLobbyBtn.style.pointerEvents = "all"
+  exitLobbyBtn.style.opacity = "1"
   lobbyIdInput.value = ""
   lobbyIdInput.setAttribute("disabled", "true")
   lobbyInfo.textContent = JSON.stringify(lobby, null, 2)
@@ -266,6 +292,8 @@ function createLobby(lobby) {
 function joinLobby(lobby) {
   createLobbyBtn.setAttribute("disabled", "true")
   joinLobbyBtn.setAttribute("disabled", "true")
+  exitLobbyBtn.style.pointerEvents = "all"
+  exitLobbyBtn.style.opacity = "1"
   lobbyIdInput.value = ""
   lobbyIdInput.setAttribute("disabled", "true")
   lobbyInfo.textContent = JSON.stringify(lobby, null, 2)
