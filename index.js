@@ -57,14 +57,22 @@ wss.on("connection", function connection(ws, req) {
     if (data.type === "exit-lobby") {
       const lobbyId = data.lobbyId
       const lobby = exitLobby(lobbyId, ip)
-      broadcast(
+      //TODO: only send this to the user to wanted to exit the lobby, then update the Lobby info for all the other users
+      ws.send(
         JSON.stringify({
           type: "exit-lobby",
           message: `Player ${ip} has left the lobby`,
           lobbyId,
           data: lobby,
-        }),
-        ws
+        })
+      )
+      broadcast(
+        JSON.stringify({
+          type: "update",
+          message: `Player ${ip} has left the lobby`,
+          lobbyId,
+          data: { lobby },
+        })
       )
       // return
     }
