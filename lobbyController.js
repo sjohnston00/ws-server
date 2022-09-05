@@ -71,17 +71,18 @@ export function joinLobby(lobbyId, ip) {
   return lobby
 }
 
-export function makeMove(lobbyId, data) {
+export function makeMove(lobbyId, data, ip) {
   if (!lobbies.has(lobbyId)) {
     console.log(`This lobby does not exist`)
     return
   }
 
   const lobby = lobbies.get(lobbyId)
+  lobby.lastUpdated = new Date()
   lobby.logEvent({
     type: "move",
-    data: data,
+    data: { move: data, player: ip },
   })
-
   lobbies.set(lobbyId, lobby)
+  return lobby
 }

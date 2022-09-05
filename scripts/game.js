@@ -12,7 +12,7 @@ ws.addEventListener("open", (e) => {
   updateWsInfo({ ...e, connected: true })
 })
 ws.addEventListener("message", async (e) => {
-  updateWsInfo()
+  // updateWsInfo()
 
   const data = e.data
   const json = JSON.parse(data)
@@ -32,7 +32,7 @@ ws.addEventListener("message", async (e) => {
   }
 
   if (json.data?.lobby?.id === currentLobby?.id) {
-    updateLobbyInfo(json.data)
+    updateLobbyInfo(json.data.lobby)
   }
 
   if (player === 2) {
@@ -170,22 +170,29 @@ document.body.addEventListener("keydown", (e) => {
   const playerClassName = `player${[playerNumber]}`
 
   const activeSquare = document.querySelector(`.cell.${playerClassName}`)
+  let moveData = {
+    type: "move",
+    data: {
+      lobbyId: currentLobby?.id,
+      move: key,
+    },
+  }
 
   if (key === "ArrowLeft") {
     if (!activeSquare.previousElementSibling) return //we're at the left most side
     activeSquare.classList.remove(playerClassName)
     activeSquare.previousElementSibling.classList.add(playerClassName)
-    ws.send(`${playerClassName}-${key}`)
-    return
+    // ws.send(`${playerClassName}-${key}`)
+    // return
   }
 
   if (key === "ArrowRight") {
     if (!activeSquare.nextElementSibling) return //we're at the right most side
     activeSquare.classList.remove(playerClassName)
     activeSquare.nextElementSibling.classList.add(playerClassName)
-    ws.send(`${playerClassName}-${key}`)
+    // ws.send(`${playerClassName}-${key}`)
 
-    return
+    // return
   }
 
   if (key === "ArrowUp") {
@@ -196,9 +203,9 @@ document.body.addEventListener("keydown", (e) => {
     activeSquare.parentNode.previousElementSibling.children[
       indexOfNode
     ].classList.add(playerClassName)
-    ws.send(`${playerClassName}-${key}`)
+    // ws.send(`${playerClassName}-${key}`)
 
-    return
+    // return
   }
 
   if (key === "ArrowDown") {
@@ -208,10 +215,12 @@ document.body.addEventListener("keydown", (e) => {
     activeSquare.parentNode.nextElementSibling.children[
       indexOfNode
     ].classList.add(playerClassName)
-    ws.send(`${playerClassName}-${key}`)
+    // ws.send(`${playerClassName}-${key}`)
 
-    return
+    // return
   }
+
+  ws.send(JSON.stringify(moveData))
 })
 
 createLobbyBtn?.addEventListener("click", () => {
