@@ -57,7 +57,6 @@ wss.on("connection", function connection(ws, req) {
     if (data.type === "exit-lobby") {
       const lobbyId = data.lobbyId
       const lobby = exitLobby(lobbyId, ip)
-      //TODO: only send this to the user to wanted to exit the lobby, then update the Lobby info for all the other users
       ws.send(
         JSON.stringify({
           type: "exit-lobby",
