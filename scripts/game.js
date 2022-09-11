@@ -5,6 +5,7 @@ const progress = document.querySelector("progress");
 const createLobbyBtn = document.getElementById("create-lobby");
 const joinLobbyBtn = document.getElementById("join-lobby");
 const exitLobbyBtn = document.getElementById("exit-lobby");
+const viewAllLobbiesBtn = document.getElementById("view-all-lobbies");
 const lobbyIdInput = document.getElementById("lobby-id");
 const lobbyInfo = document.getElementById("lobby-info");
 const wsInfo = document.getElementById("ws-info");
@@ -251,6 +252,10 @@ joinLobbyBtn?.addEventListener("click", () => {
     }
   });
   ws.send(data);
+});
+
+viewAllLobbiesBtn.addEventListener("click", () => {
+  console.log(viewAllLobbiesBtn, "clicked");
 });
 
 exitLobbyBtn.addEventListener("click", () => {
