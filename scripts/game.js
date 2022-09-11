@@ -9,6 +9,7 @@ const viewAllLobbiesBtn = document.getElementById("view-all-lobbies");
 const lobbyIdInput = document.getElementById("lobby-id");
 const lobbyInfo = document.getElementById("lobby-info");
 const wsInfo = document.getElementById("ws-info");
+const lobbiesDialog = document.getElementById("lobbies-dialog");
 let currentLobby;
 ws.addEventListener("open", (e) => {
   updateWsInfo({ ...e, connected: true });
@@ -266,6 +267,7 @@ viewAllLobbiesBtn.addEventListener("click", () => {
   });
 
   ws.send(data);
+  lobbiesDialog.showModal();
 });
 
 exitLobbyBtn.addEventListener("click", () => {
