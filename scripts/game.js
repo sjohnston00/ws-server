@@ -33,8 +33,13 @@ ws.addEventListener("message", async (e) => {
     return;
   }
 
-  if (currentLobby.id === json.lobbyId && json.type === "exit-lobby") {
+  if (currentLobby?.id === json.lobbyId && json.type === "exit-lobby") {
     updateLobbyInfo(undefined);
+    return;
+  }
+
+  if (json.type === "all-lobbies") {
+    console.log(json);
     return;
   }
 
@@ -255,7 +260,12 @@ joinLobbyBtn?.addEventListener("click", () => {
 });
 
 viewAllLobbiesBtn.addEventListener("click", () => {
-  console.log(viewAllLobbiesBtn, "clicked");
+  const data = JSON.stringify({
+    type: "all-lobbies",
+    data: null
+  });
+
+  ws.send(data);
 });
 
 exitLobbyBtn.addEventListener("click", () => {
