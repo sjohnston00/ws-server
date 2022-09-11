@@ -10,6 +10,8 @@ const lobbyIdInput = document.getElementById("lobby-id");
 const lobbyInfo = document.getElementById("lobby-info");
 const wsInfo = document.getElementById("ws-info");
 const lobbiesDialog = document.getElementById("lobbies-dialog");
+const lobbiesDiv = document.getElementById("lobbies");
+const closeDialogBtn = document.getElementById("close-dialog");
 let currentLobby;
 ws.addEventListener("open", (e) => {
   updateWsInfo({ ...e, connected: true });
@@ -41,6 +43,7 @@ ws.addEventListener("message", async (e) => {
 
   if (json.type === "all-lobbies") {
     console.log(json);
+    displayLobbies(json.data.lobbies);
     return;
   }
 
@@ -270,6 +273,10 @@ viewAllLobbiesBtn.addEventListener("click", () => {
   lobbiesDialog.showModal();
 });
 
+closeDialogBtn.addEventListener("click", () => {
+  clearLobbiesList();
+});
+
 exitLobbyBtn.addEventListener("click", () => {
   if (!currentLobby) return;
 
@@ -319,4 +326,16 @@ function joinLobby(lobby) {
 function updateLobbyInfo(lobby) {
   currentLobby = lobby;
   lobbyInfo.textContent = JSON.stringify(currentLobby, null, 2);
+}
+
+function displayLobbies(lobbies) {
+  Object.entries(lobbies).forEach(([column, lobby]) => {
+    lobbiesDiv.innerHTML += `
+      <button style="display:block;">${lobby.id}</button>
+    `;
+  });
+}
+
+function clearLobbiesList() {
+  lobbiesDiv.innerHTML = "";
 }
