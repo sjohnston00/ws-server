@@ -15,6 +15,9 @@ button {
   padding: 4px 8px;
   cursor: pointer;
 }
+button:disabled {
+  cursor: not-allowed;
+}
 
 .grid {
   margin-block-end: 10px; /* same as margin bottom */
