@@ -6,22 +6,35 @@ import {
   exitLobby,
   joinLobby,
   makeMove,
-  lobbies
+  lobbies,
+  getLobbyByPlayerId
 } from "./lobbyController.js";
 
 const PORT = 8080;
 const IP_ADDRESS = ip.address();
 const wss = new WebSocketServer({ port: PORT });
+const players = new Set();
 wss.on("connection", function connection(ws, req) {
+  const key = req.headers["sec-websocket-key"];
+  const idCookie = getCookie(req.headers.cookie, "id");
+  const id = idCookie || key;
+  // console.log(req.headers.cookie);
+  // console.log(cookie);
+  if (!players.has(id)) {
+    players.add(id);
+    ws.send(JSON.stringify({ type: "set-cookie", data: id }));
+  }
+  // console.log(players);
   const ip = req.socket.remoteAddress;
   ws.on("message", function message(d) {
+    console.log(getLobbyByPlayerId(id));
     const data = parseMsgData(d);
     if (!data) return;
 
     let lobby;
 
     if (data.type === "create-lobby") {
-      lobby = createLobby(ip);
+      lobby = createLobby(id);
       ws.send(
         JSON.stringify({
           type: "create-lobby",
@@ -32,7 +45,7 @@ wss.on("connection", function connection(ws, req) {
       return;
     }
     if (data.type === "join-lobby") {
-      lobby = joinLobby(data.data.lobbyId, ip);
+      lobby = joinLobby(data.data.lobbyId, id);
       broadcast(
         JSON.stringify({
           type: "join-lobby",
@@ -44,11 +57,11 @@ wss.on("connection", function connection(ws, req) {
       // return
     }
     if (data.type === "move") {
-      const lobby = makeMove(data.data.lobbyId, data.data.move, ip);
+      const lobby = makeMove(data.data.lobbyId, data.data.move, id);
       broadcast(
         JSON.stringify({
           type: "move",
-          message: `Move was made by ${ip}`,
+          message: `Move was made by ${id}`,
           data: { lobby }
         }),
         ws
@@ -66,11 +79,11 @@ wss.on("connection", function connection(ws, req) {
     }
     if (data.type === "exit-lobby") {
       const lobbyId = data.lobbyId;
-      const lobby = exitLobby(lobbyId, ip);
+      const lobby = exitLobby(lobbyId, id);
       ws.send(
         JSON.stringify({
           type: "exit-lobby",
-          message: `Player ${ip} has left the lobby`,
+          message: `Player ${id} has left the lobby`,
           lobbyId,
           data: lobby
         })
@@ -78,7 +91,7 @@ wss.on("connection", function connection(ws, req) {
       broadcast(
         JSON.stringify({
           type: "update",
-          message: `Player ${ip} has left the lobby`,
+          message: `Player ${id} has left the lobby`,
           lobbyId,
           data: { lobby }
         })
@@ -117,4 +130,10 @@ function parseMsgData(data) {
     json = null;
   }
   return json;
+}
+
+function getCookie(cookies, name) {
+  const value = `; ${cookies}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
 }

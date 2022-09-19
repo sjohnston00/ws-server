@@ -69,5 +69,14 @@ button:disabled {
   pointer-events: none;
 }
 #lobbies-dialog {
+  min-width: 200px;
   margin: auto;
+  padding: 20px;
+  padding-top: 30px;
+}
+
+#close-dialog {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
