@@ -1,4 +1,3 @@
-//@ts-nocheck
 const myIPs = ["192.168.1.21", "192.168.1.82", "192.168.240.1", "localhost"];
 const ws = new WebSocket(`ws://${myIPs[3]}:8080`);
 const progress = document.querySelector("progress");
@@ -12,6 +11,7 @@ const wsInfo = document.getElementById("ws-info");
 const lobbiesDialog = document.getElementById("lobbies-dialog");
 const lobbiesDiv = document.getElementById("lobbies");
 const closeDialogBtn = document.getElementById("close-dialog");
+const playerId = getCookie(document.cookie, "id");
 let currentLobby;
 ws.addEventListener("open", (e) => {
   updateWsInfo({ ...e, connected: true });
@@ -22,7 +22,7 @@ ws.addEventListener("message", async (e) => {
   const data = e.data;
   const json = JSON.parse(data);
 
-  // console.log(json)
+  // console.log(json);
   // console.log(currentLobby)
   if (json.type === "set-cookie") {
     document.cookie = `id=${json.data}; SameSite=lax; Secure`;
@@ -36,12 +36,18 @@ ws.addEventListener("message", async (e) => {
   }
   if (!currentLobby && json.type === "join-lobby") {
     currentLobby = json.data.lobby;
+    player = 2;
     joinLobby(currentLobby);
     return;
   }
 
   if (currentLobby?.id === json.lobbyId && json.type === "exit-lobby") {
     updateLobbyInfo(undefined);
+    return;
+  }
+
+  if (currentLobby?.id === json.data?.lobby?.id && json.type === "move") {
+    console.log(`move for lobby ${json.data.lobby.id}`);
     return;
   }
 
@@ -162,7 +168,7 @@ ws.addEventListener("error", (e) => {
   updateWsInfo({ ...e, connected: false });
 });
 
-const player = Number(
+let player = Number(
   Object.fromEntries(new URL(window.location.href).searchParams).player
 );
 
@@ -176,6 +182,7 @@ const player = Number(
 })();
 
 document.body.addEventListener("keydown", (e) => {
+  if (!currentLobby) return;
   const { key } = e;
 
   if (
@@ -376,4 +383,10 @@ function displayLobbies(lobbies) {
 
 function clearLobbiesList() {
   lobbiesDiv.innerHTML = "";
+}
+
+function getCookie(cookies, name) {
+  const value = `; ${cookies}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
 }

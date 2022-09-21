@@ -18,16 +18,11 @@ wss.on("connection", function connection(ws, req) {
   const key = req.headers["sec-websocket-key"];
   const idCookie = getCookie(req.headers.cookie, "id");
   const id = idCookie || key;
-  // console.log(req.headers.cookie);
-  // console.log(cookie);
   if (!players.has(id)) {
     players.add(id);
     ws.send(JSON.stringify({ type: "set-cookie", data: id }));
   }
-  // console.log(players);
-  const ip = req.socket.remoteAddress;
   ws.on("message", function message(d) {
-    console.log(getLobbyByPlayerId(id));
     const data = parseMsgData(d);
     if (!data) return;
 
